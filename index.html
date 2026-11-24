@@ -56,6 +56,25 @@ canvas{display:block;border-radius:22px;box-shadow:0 0 40px rgba(0,0,0,.8),0 0 6
 .lang{display:flex;gap:6px;margin-top:10px;background:rgba(255,255,255,.07);padding:4px;border-radius:999px}
 .lang button{border:none;background:transparent;color:#fff;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer;opacity:.6}
 .lang button.on{background:rgba(255,255,255,.18);opacity:1;box-shadow:0 0 12px rgba(255,47,209,.5)}
+.player{display:flex;align-items:center;gap:10px;margin:-6px 0 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);padding:6px 6px 6px 14px;border-radius:999px;font-weight:800;font-size:16px}
+.player button{border:none;border-radius:999px;padding:8px 14px;background:linear-gradient(90deg,#00f0ff,#ff2fd1);color:#120018;font-weight:800;font-size:13px;cursor:pointer}
+#nameIn{font:900 28px Impact,"Arial Black",sans-serif;letter-spacing:1px;text-align:center;width:min(90vw,360px);padding:14px 16px;border-radius:16px;border:2px solid #ff2fd1;background:rgba(0,0,0,.5);color:#fff;margin-top:20px;outline:none;box-shadow:0 0 20px rgba(255,47,209,.4)}
+.board{width:100%;max-width:640px;margin-top:26px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:16px}
+.bhead{font:900 24px Impact,"Arial Black",sans-serif;letter-spacing:2px;color:#ffe600;text-shadow:0 0 12px rgba(255,230,0,.5)}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:10px 0 8px;padding-bottom:4px;touch-action:pan-x}
+.tabs button{flex:none;border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;opacity:.7}
+.tabs button.on{background:rgba(255,255,255,.16);opacity:1}
+#boardList{list-style:none}
+#boardList li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.07)}
+#boardList li:last-child{border-bottom:none}
+#boardList .rk{font:900 18px Impact,sans-serif;text-align:center;opacity:.8}
+#boardList li:nth-child(1) .rk{color:#ffd700}#boardList li:nth-child(2) .rk{color:#d8d8e0}#boardList li:nth-child(3) .rk{color:#e0965a}
+#boardList .nm2{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#boardList .sub{font-size:11px;opacity:.55;font-weight:600}
+#boardList .pts{font:900 18px Impact,sans-serif;white-space:nowrap}
+#boardList li.me{background:rgba(255,47,209,.18);border-radius:12px}
+#boardList .empty{display:block;opacity:.6;text-align:center;padding:14px}
+.rank{margin-top:10px;font-weight:800;font-size:18px;color:#00f0ff}
 .credit{margin-top:26px;font:800 12px system-ui,sans-serif;letter-spacing:3px;text-transform:uppercase;opacity:.55;text-align:center}
 .vol label{display:flex;gap:8px;align-items:center}
 </style>
@@ -75,8 +94,14 @@ canvas{display:block;border-radius:22px;box-shadow:0 0 40px rgba(0,0,0,.8),0 0 6
   <div class="logo">FLIPPERFEST</div>
   <div class="lang" id="langSel"><button data-l="no">🇳🇴 Norsk</button><button data-l="en">🇬🇧 English</button></div>
   <div class="tag" data-i="pick">Velg tema – trykk på et kort for å høre musikken 🎶</div>
+  <div class="player" id="playerChip"><span>👤</span><span id="pName">–</span><button id="bEditName" data-i="editname">Endre navn</button></div>
   <div id="themes"></div>
   <button class="big" id="bStart" data-i="play">SPILL!</button>
+  <div class="board">
+    <div class="bhead">🏆 <span data-i="top10">TOPP 10</span></div>
+    <div class="tabs" id="boardTabs"></div>
+    <ol id="boardList"></ol>
+  </div>
   <div class="vol">
     <label><input type="checkbox" id="optMusic" checked> <span data-i="music">Musikk</span></label>
     <label><input type="checkbox" id="optSfx" checked> <span data-i="sfx">Lydeffekter</span></label>
@@ -90,18 +115,27 @@ canvas{display:block;border-radius:22px;box-shadow:0 0 40px rgba(0,0,0,.8),0 0 6
   <button class="big" id="bResume" data-i="resume">FORTSETT</button>
   <button class="big alt" id="bRestart" data-i="restart">Start på nytt</button>
   <button class="big alt" id="bToMenu" data-i="change">Bytt tema</button>
+  <button class="big alt" id="bPauseName" data-i="editname">Endre navn</button>
 </div>
 
 <div id="overOv" class="ov center hidden">
   <div class="logo" style="font-size:52px">GAME OVER</div>
   <div class="tag" id="overTheme"></div>
   <div class="final" id="finalScore">0</div>
-  <div class="credit" style="margin-top:24px">© Wåle Production 2026</div>
   <div class="newrec hidden" id="newRec" data-i="newrec">★ NY REKORD! ★</div>
+  <div class="rank hidden" id="rankMsg"></div>
   <div class="row"><button class="big" id="bAgain" data-i="again">SPILL IGJEN</button></div>
   <button class="big alt" id="bOverMenu" data-i="change">Bytt tema</button>
+  <div class="credit" style="margin-top:24px">© Wåle Production 2026</div>
 </div>
 
+<div id="nameOv" class="ov center hidden" style="z-index:20">
+  <div class="logo" style="font-size:40px" data-i="whoplays">HVEM SPILLER?</div>
+  <input id="nameIn" maxlength="14" autocomplete="off" spellcheck="false">
+  <div class="tag" data-i="namehint">Skriv inn spillernavnet ditt (maks 14 tegn)</div>
+  <button class="big" id="bNameOk">OK</button>
+  <button class="big alt" id="bNameCancel" data-i="cancel">Avbryt</button>
+</div>
 <script>
 "use strict";
 /* =========================================================
@@ -136,10 +170,10 @@ let themeKey='rock',T=THEMES.rock;
 const TXT={
  no:{score:'POENG',best:'REKORD',pick:'Velg tema – trykk på et kort for å høre musikken 🎶',play:'SPILL!',music:'Musikk',sfx:'Lydeffekter',resume:'FORTSETT',restart:'Start på nytt',change:'Bytt tema',newrec:'★ NY REKORD! ★',again:'SPILL IGJEN',
   help:'<b>Mobil:</b> trykk venstre/høyre halvdel for flipperne. Hold på høyre side og slipp for å skyte ut ballen.<br><b>PC:</b> ← / Z og → / M for flipperne, hold <b>MELLOMROM</b> og slipp for å skyte.<br>Slå ned de 3 rosa målene = <b>DOBBEL BALL</b> · Lås 3 baller i hullet = <b>TRIPPEL BALL</b><br>Tenn alle 5 bokstavene øverst = høyere <b>multiplikator</b> · Store summer = <b>FYRVERKERI &amp; EKSPLOSJONER</b> 💥',
-  ball:'BALL',of:'av',points:'POENG',mega:'MEGA SCORE!',extra:'EKSTRA BALL!',million:'MILLION!!!',millions:'MILLIONER!',legend:'🔥 LEGENDARISK 🔥',double:'DOBBEL BALL!',triple:'TRIPPEL BALL!',saved:'BALL REDDET!',tryagain:'prøv igjen',locked:'BALL LÅST',multx:'MULTIPLIKATOR x',hold:'HOLD & SLIPP ▶'},
+  ball:'BALL',of:'av',points:'POENG',mega:'MEGA SCORE!',extra:'EKSTRA BALL!',million:'MILLION!!!',millions:'MILLIONER!',legend:'🔥 LEGENDARISK 🔥',double:'DOBBEL BALL!',triple:'TRIPPEL BALL!',saved:'BALL REDDET!',tryagain:'prøv igjen',locked:'BALL LÅST',multx:'MULTIPLIKATOR x',hold:'HOLD & SLIPP ▶',editname:'Endre navn',top10:'TOPP 10',all:'Alle',whoplays:'HVEM SPILLER?',namehint:'Skriv inn spillernavnet ditt (maks 14 tegn)',cancel:'Avbryt',noscores:'Ingen poeng ennå – bli den første på lista!',place:'Du kom på {n}. plass på topp 10! 🎉',guest:'Spiller'},
  en:{score:'SCORE',best:'BEST',pick:'Choose a theme – tap a card to hear the music 🎶',play:'PLAY!',music:'Music',sfx:'Sound effects',resume:'RESUME',restart:'Restart',change:'Change theme',newrec:'★ NEW HIGH SCORE! ★',again:'PLAY AGAIN',
   help:'<b>Mobile:</b> tap the left/right half for the flippers. Hold the right side and release to launch the ball.<br><b>PC:</b> ← / Z and → / M for the flippers, hold <b>SPACE</b> and release to launch.<br>Knock down the 3 pink targets = <b>DOUBLE BALL</b> · Lock 3 balls in the hole = <b>TRIPLE BALL</b><br>Light all 5 letters at the top = higher <b>multiplier</b> · Big scores = <b>FIREWORKS &amp; EXPLOSIONS</b> 💥',
-  ball:'BALL',of:'of',points:'POINTS',mega:'MEGA SCORE!',extra:'EXTRA BALL!',million:'MILLION!!!',millions:'MILLION!',legend:'🔥 LEGENDARY 🔥',double:'DOUBLE BALL!',triple:'TRIPLE BALL!',saved:'BALL SAVED!',tryagain:'try again',locked:'BALL LOCKED',multx:'MULTIPLIER x',hold:'HOLD & RELEASE ▶'}};
+  ball:'BALL',of:'of',points:'POINTS',mega:'MEGA SCORE!',extra:'EXTRA BALL!',million:'MILLION!!!',millions:'MILLION!',legend:'🔥 LEGENDARY 🔥',double:'DOUBLE BALL!',triple:'TRIPLE BALL!',saved:'BALL SAVED!',tryagain:'try again',locked:'BALL LOCKED',multx:'MULTIPLIER x',hold:'HOLD & RELEASE ▶',editname:'Change name',top10:'TOP 10',all:'All',whoplays:'WHO IS PLAYING?',namehint:'Enter your player name (max 14 characters)',cancel:'Cancel',noscores:'No scores yet – be the first on the list!',place:'You made #{n} on the top 10! 🎉',guest:'Player'}};
 let LANG='no';try{LANG=localStorage.getItem('flipperfest-lang')||'no';}catch(e){}
 const L=k=>TXT[LANG][k]??TXT.no[k];
 const TN=t=>LANG==='en'?t.en.name:t.name, TD=t=>LANG==='en'?t.en.desc:t.desc;
@@ -149,7 +183,35 @@ function applyLang(){
  document.querySelectorAll('[data-ih]').forEach(e=>e.innerHTML=L(e.dataset.ih));
  document.querySelectorAll('#langSel button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 }
-function setLang(l){LANG=l;try{localStorage.setItem('flipperfest-lang',l);}catch(e){}applyLang();buildMenu();buildBg();updHud();}
+function setLang(l){LANG=l;try{localStorage.setItem('flipperfest-lang',l);}catch(e){}applyLang();buildMenu();buildBg();updHud();renderBoard();showName();}
+/* spillernavn og topp 10 (lagres på enheten) */
+let PLAYER='';try{PLAYER=localStorage.getItem('flipperfest-player')||'';}catch(e){}
+let boardTab='all',lastEntry=null;
+function loadTop(){try{return JSON.parse(localStorage.getItem('flipperfest-top')||'[]');}catch(e){return[];}}
+function saveTop(a){try{localStorage.setItem('flipperfest-top',JSON.stringify(a));}catch(e){}}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function showName(){const el=$('pName');if(el)el.textContent=PLAYER||L('guest');}
+let nameCb=null;
+function askName(cb){nameCb=cb||null;$('nameIn').value=PLAYER;$('nameOv').classList.remove('hidden');setTimeout(()=>{$('nameIn').focus();$('nameIn').select();},50);}
+function nameDone(ok){
+ if(ok){const v=$('nameIn').value.trim().replace(/\s+/g,' ').slice(0,14);if(!v){$('nameIn').focus();return;}PLAYER=v;try{localStorage.setItem('flipperfest-player',v);}catch(e){}showName();}
+ $('nameOv').classList.add('hidden');const cb=nameCb;nameCb=null;if(ok&&cb)cb();
+}
+function addTop(sc){
+ if(sc<=0)return 0;const e={n:PLAYER||L('guest'),s:Math.floor(sc),t:themeKey,d:Date.now()};lastEntry=e.d;
+ const a=loadTop();a.push(e);a.sort((x,y)=>y.s-x.s);const keep=[];const per={};
+ // behold topp 10 totalt + topp 10 per tema
+ a.forEach((x,i)=>{per[x.t]=(per[x.t]||0)+1;if(i<10||per[x.t]<=10)keep.push(x);});saveTop(keep);
+ const rank=keep.findIndex(x=>x.d===e.d)+1;return rank<=10?rank:0;
+}
+function renderBoard(){
+ const tabs=$('boardTabs');if(!tabs)return;
+ tabs.innerHTML=[['all','⭐ '+L('all')],...Object.entries(THEMES).map(([k,t])=>[k,t.emoji+' '+TN(t)])].map(([k,l])=>`<button data-k="${k}" class="${k===boardTab?'on':''}">${esc(l)}</button>`).join('');
+ tabs.querySelectorAll('button').forEach(b=>b.onclick=()=>{boardTab=b.dataset.k;renderBoard();});
+ const list=loadTop().filter(x=>boardTab==='all'||x.t===boardTab).slice(0,10);
+ const loc=LANG==='en'?'en-GB':'nb-NO';
+ $('boardList').innerHTML=list.length?list.map((x,i)=>{const th=THEMES[x.t]||THEMES.rock;return`<li class="${x.d===lastEntry?'me':''}"><span class="rk">${i+1}</span><span><div class="nm2">${esc(x.n)}</div><div class="sub">${th.emoji} ${esc(TN(th))} · ${new Date(x.d).toLocaleDateString(loc,{day:'numeric',month:'short'})}</div></span><span class="pts">${fmt(x.s)}</span></li>`;}).join(''):`<li class="empty">${esc(L('noscores'))}</li>`;
+}
 const pal=()=>[T.c.n1,T.c.n2,T.c.n3,...T.c.bump];
 
 /* ---------------- LYD ---------------- */
@@ -388,7 +450,8 @@ function loseBall(){
 }
 function gameOver(){
  state='over';const best=getHS();const rec=score>best;if(rec)setHS(score);
- $('finalScore').textContent=fmt(score);$('overTheme').textContent=T.emoji+' '+TN(T);$('newRec').classList.toggle('hidden',!rec);
+ const rank=addTop(score);$('rankMsg').textContent=rank?L('place').replace('{n}',rank):'';$('rankMsg').classList.toggle('hidden',!rank);
+ $('finalScore').textContent=fmt(score);$('overTheme').textContent='👤 '+(PLAYER||L('guest'))+'  ·  '+T.emoji+' '+TN(T);$('newRec').classList.toggle('hidden',!rec);
  setTimeout(()=>$('overOv').classList.remove('hidden'),900);
  if(rec)for(let i=0;i<8;i++)setTimeout(()=>rocket(),i*150);
  updHud();
@@ -757,11 +820,14 @@ function buildMenu(){
  });
 }
 function selectTheme(k){themeKey=k;T=THEMES[k];buildBg();updHud();}
-function startGame(){initAudio();$('menu').classList.add('hidden');$('overOv').classList.add('hidden');$('pauseOv').classList.add('hidden');if(Music.key!==themeKey||!Music.timer)startMusic(themeKey);newGame();}
-function toMenu(){state='menu';balls=[];$('pauseOv').classList.add('hidden');$('overOv').classList.add('hidden');buildMenu();$('menu').classList.remove('hidden');}
+function startGame(){initAudio();if(!PLAYER){askName(startGame);return;}$('menu').classList.add('hidden');$('overOv').classList.add('hidden');$('pauseOv').classList.add('hidden');if(Music.key!==themeKey||!Music.timer)startMusic(themeKey);newGame();}
+function toMenu(){state='menu';balls=[];$('pauseOv').classList.add('hidden');$('overOv').classList.add('hidden');buildMenu();renderBoard();$('menu').classList.remove('hidden');}
 function pause(){if(state!=='play')return;state='pause';$('pauseOv').classList.remove('hidden');if(A.ctx)A.ctx.suspend();}
 function resume(){$('pauseOv').classList.add('hidden');state='play';if(A.ctx)A.ctx.resume();}
-$('bStart').onclick=startGame;$('bAgain').onclick=startGame;$('bOverMenu').onclick=toMenu;$('bToMenu').onclick=()=>{if(A.ctx)A.ctx.resume();toMenu();};
+$('bStart').onclick=startGame;
+$('bEditName').onclick=()=>askName();$('bPauseName').onclick=()=>askName();
+$('bNameOk').onclick=()=>nameDone(true);$('bNameCancel').onclick=()=>nameDone(false);
+$('nameIn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')nameDone(true);if(e.key==='Escape')nameDone(false);});$('bAgain').onclick=startGame;$('bOverMenu').onclick=toMenu;$('bToMenu').onclick=()=>{if(A.ctx)A.ctx.resume();toMenu();};
 $('bResume').onclick=resume;$('bRestart').onclick=()=>{if(A.ctx)A.ctx.resume();startGame();};
 $('bPause').onclick=e=>{e.stopPropagation();state==='pause'?resume():pause();};
 function setMusic(v){musicOn=v;$('optMusic').checked=v;if(A.music)A.music.gain.setTargetAtTime(v?0.6:0,A.ctx.currentTime,0.05);$('bSound').textContent=musicOn||sfxOn?'🔊':'🔇';}
@@ -774,6 +840,7 @@ function setFlip(i,on){const f=flippers[i];if(f.on===on)return;f.on=on;if(on&&st
  if(i===0)lanes.push(lanes.shift());else lanes.unshift(lanes.pop());}}
 const keyMap={ArrowLeft:0,KeyZ:0,ShiftLeft:0,KeyA:0,ArrowRight:1,KeyM:1,ShiftRight:1,KeyL:1,Slash:1};
 addEventListener('keydown',e=>{
+ if(!$('nameOv').classList.contains('hidden'))return;
  if(state==='menu'&&e.code==='Enter'){startGame();return;}
  if(e.code==='KeyP'||e.code==='Escape'){state==='pause'?resume():pause();return;}
  if(state!=='play')return;
@@ -805,7 +872,7 @@ function loop(t){
  requestAnimationFrame(loop);
 }
 document.querySelectorAll('#langSel button').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
-applyLang();buildMenu();resize();updHud();requestAnimationFrame(loop);
+applyLang();showName();renderBoard();buildMenu();resize();updHud();requestAnimationFrame(loop);
 // offline: lagre spillet på enheten (virker når spillet ligger på egen nettside, f.eks. Vercel)
 try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 // demo-bevegelse i menyen: noen raketter
