@@ -170,10 +170,10 @@ let themeKey='rock',T=THEMES.rock;
 const TXT={
  no:{score:'POENG',best:'REKORD',pick:'Velg tema – trykk på et kort for å høre musikken 🎶',play:'SPILL!',music:'Musikk',sfx:'Lydeffekter',resume:'FORTSETT',restart:'Start på nytt',change:'Bytt tema',newrec:'★ NY REKORD! ★',again:'SPILL IGJEN',
   help:'<b>Mobil:</b> trykk venstre/høyre halvdel for flipperne. Hold på høyre side og slipp for å skyte ut ballen.<br><b>PC:</b> ← / Z og → / M for flipperne, hold <b>MELLOMROM</b> og slipp for å skyte.<br>Slå ned de 3 rosa målene = <b>DOBBEL BALL</b> · Lås 3 baller i hullet = <b>TRIPPEL BALL</b><br>Tenn alle 5 bokstavene øverst = høyere <b>multiplikator</b> · Store summer = <b>FYRVERKERI &amp; EKSPLOSJONER</b> 💥',
-  ball:'BALL',of:'av',points:'POENG',mega:'MEGA SCORE!',extra:'EKSTRA BALL!',million:'MILLION!!!',millions:'MILLIONER!',legend:'🔥 LEGENDARISK 🔥',double:'DOBBEL BALL!',triple:'TRIPPEL BALL!',saved:'BALL REDDET!',tryagain:'prøv igjen',locked:'BALL LÅST',multx:'MULTIPLIKATOR x',hold:'HOLD & SLIPP ▶',editname:'Endre navn',top10:'TOPP 10',all:'Alle',whoplays:'HVEM SPILLER?',namehint:'Skriv inn spillernavnet ditt (maks 14 tegn)',cancel:'Avbryt',noscores:'Ingen poeng ennå – bli den første på lista!',place:'Du kom på {n}. plass på topp 10! 🎉',guest:'Spiller'},
+  ball:'BALL',of:'av',points:'POENG',mega:'MEGA SCORE!',extra:'EKSTRA BALL!',million:'MILLION!!!',millions:'MILLIONER!',legend:'🔥 LEGENDARISK 🔥',double:'DOBBEL BALL!',triple:'TRIPPEL BALL!',saved:'BALL REDDET!',tryagain:'prøv igjen',locked:'BALL LÅST',multx:'MULTIPLIKATOR x',hold:'HOLD & SLIPP ▶',editname:'Endre navn',top10:'TOPP 10',all:'Alle',whoplays:'HVEM SPILLER?',namehint:'Skriv inn spillernavnet ditt (maks 14 tegn)',cancel:'Avbryt',noscores:'Ingen poeng ennå – bli den første på lista!',place:'Du kom på {n}. plass på topp 10! 🎉',guest:'Spiller',ramp:'KANAL!',ramp5:'KANALKONGE!'},
  en:{score:'SCORE',best:'BEST',pick:'Choose a theme – tap a card to hear the music 🎶',play:'PLAY!',music:'Music',sfx:'Sound effects',resume:'RESUME',restart:'Restart',change:'Change theme',newrec:'★ NEW HIGH SCORE! ★',again:'PLAY AGAIN',
   help:'<b>Mobile:</b> tap the left/right half for the flippers. Hold the right side and release to launch the ball.<br><b>PC:</b> ← / Z and → / M for the flippers, hold <b>SPACE</b> and release to launch.<br>Knock down the 3 pink targets = <b>DOUBLE BALL</b> · Lock 3 balls in the hole = <b>TRIPLE BALL</b><br>Light all 5 letters at the top = higher <b>multiplier</b> · Big scores = <b>FIREWORKS &amp; EXPLOSIONS</b> 💥',
-  ball:'BALL',of:'of',points:'POINTS',mega:'MEGA SCORE!',extra:'EXTRA BALL!',million:'MILLION!!!',millions:'MILLION!',legend:'🔥 LEGENDARY 🔥',double:'DOUBLE BALL!',triple:'TRIPLE BALL!',saved:'BALL SAVED!',tryagain:'try again',locked:'BALL LOCKED',multx:'MULTIPLIER x',hold:'HOLD & RELEASE ▶',editname:'Change name',top10:'TOP 10',all:'All',whoplays:'WHO IS PLAYING?',namehint:'Enter your player name (max 14 characters)',cancel:'Cancel',noscores:'No scores yet – be the first on the list!',place:'You made #{n} on the top 10! 🎉',guest:'Player'}};
+  ball:'BALL',of:'of',points:'POINTS',mega:'MEGA SCORE!',extra:'EXTRA BALL!',million:'MILLION!!!',millions:'MILLION!',legend:'🔥 LEGENDARY 🔥',double:'DOUBLE BALL!',triple:'TRIPLE BALL!',saved:'BALL SAVED!',tryagain:'try again',locked:'BALL LOCKED',multx:'MULTIPLIER x',hold:'HOLD & RELEASE ▶',editname:'Change name',top10:'TOP 10',all:'All',whoplays:'WHO IS PLAYING?',namehint:'Enter your player name (max 14 characters)',cancel:'Cancel',noscores:'No scores yet – be the first on the list!',place:'You made #{n} on the top 10! 🎉',guest:'Player',ramp:'RAMP!',ramp5:'RAMP MASTER!'}};
 let LANG='no';try{LANG=localStorage.getItem('flipperfest-lang')||'no';}catch(e){}
 const L=k=>TXT[LANG][k]??TXT.no[k];
 const TN=t=>LANG==='en'?t.en.name:t.name, TD=t=>LANG==='en'?t.en.desc:t.desc;
@@ -383,6 +383,7 @@ function sfxBoom(big=1){sfx(t=>{noiseHit(t,0.9*big,1.4,'lowpass',500,0.5,0.4);co
 function sfxPop(){sfx(t=>{noiseHit(t,0.35,0.3,'highpass',2000,0.5,0.4);for(let i=0;i<6;i++)noiseHit(t+0.1+rand()*0.4,0.08,0.03,'highpass',5000,0.5);});}
 function sfxWhoosh(){sfx(t=>{const C=A.ctx,s=C.createBufferSource();s.buffer=A.noise;const f=C.createBiquadFilter();f.type='bandpass';f.Q.value=3;f.frequency.setValueAtTime(800,t);f.frequency.exponentialRampToValueAtTime(5000,t+0.5);const g=C.createGain();perc(g,t,0.1,0.5,0.1);s.connect(f);f.connect(g);route(g);s.start(t);s.stop(t+0.7);});}
 function sfxFanfare(){sfx(t=>{const b=T.scale[0];[0,4,7,12,16,19,24].forEach((iv,i)=>stab(t+i*0.07,[mtof(b-12+iv)],0.25,0.08,0.3));});}
+function sfxRamp(){sfx(t=>{const C=A.ctx,s=C.createBufferSource();s.buffer=A.noise;const f=C.createBiquadFilter();f.type='bandpass';f.Q.value=4;f.frequency.setValueAtTime(400,t);f.frequency.exponentialRampToValueAtTime(6000,t+0.9);const g=C.createGain();perc(g,t,0.22,0.9,0.2);s.connect(f);f.connect(g);route(g,0.3);s.start(t);s.stop(t+1.2);const b=T.scale[0];[0,7,12,19].forEach((iv,i)=>tone(t+i*0.08,'square',mtof(b+iv),0.09,0.15,null,0.2));});}
 function sfxSave(){sfx(t=>{[0,7,12].forEach((iv,i)=>tone(t+i*0.08,'triangle',mtof(76+iv),0.15,0.2));});}
 
 /* ---------------- BORD / GEOMETRI ---------------- */
@@ -392,6 +393,32 @@ const bumpers=[{x:195,y:240,r:28,hit:0},{x:355,y:240,r:28,hit:0},{x:275,y:335,r:
 const posts=[{x:120,y:380,r:11,hit:0},{x:430,y:380,r:11,hit:0}];
 const laneX=[195,235,275,315,355],LANE_Y=118;
 const saucer={x:275,y:485,ball:null,t:0};
+/* kanaler øverst: ballen skytes inn og går i en glassrenne over bordet */
+function spline(pts,step=4){const out=[];for(let i=0;i<pts.length-1;i++){const p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+ for(let t=0;t<1;t+=0.04){const t2=t*t,t3=t2*t;out.push([0.5*((2*p1[0])+(-p0[0]+p2[0])*t+(2*p0[0]-5*p1[0]+4*p2[0]-p3[0])*t2+(-p0[0]+3*p1[0]-3*p2[0]+p3[0])*t3),0.5*((2*p1[1])+(-p0[1]+p2[1])*t+(2*p0[1]-5*p1[1]+4*p2[1]-p3[1])*t2+(-p0[1]+3*p1[1]-3*p2[1]+p3[1])*t3)]);}}
+ out.push(pts[pts.length-1]);const len=[0];for(let i=1;i<out.length;i++)len.push(len[i-1]+Math.hypot(out[i][0]-out[i-1][0],out[i][1]-out[i-1][1]));return{pts:out,len,total:len[len.length-1]};}
+const ramps=[
+ {id:0,ex:95,ey:268,exitV:[0,520],path:spline([[95,268],[85,180],[130,105],[210,70],[300,60],[390,70],[460,110],[500,190],[504,330],[502,500],[502,665]]),lit:0},
+ {id:1,ex:455,ey:268,exitV:[0,520],path:spline([[455,268],[470,180],[430,105],[350,62],[250,62],[160,90],[105,140],[65,215],[50,330],[48,500],[48,665]]),lit:0}];
+let rampCombo=0,rampComboT=0,rampCount=0;
+function rampPos(r,d){const P=r.path;let i=1;while(i<P.len.length-1&&P.len[i]<d)i++;const f=(d-P.len[i-1])/((P.len[i]-P.len[i-1])||1);return[P.pts[i-1][0]+(P.pts[i][0]-P.pts[i-1][0])*f,P.pts[i-1][1]+(P.pts[i][1]-P.pts[i-1][1])*f];}
+function enterRamp(b,r){b.ramp=r;b.rd=0;b.cap=true;r.lit=0.6;
+ rampCombo=rampComboT>0?rampCombo+1:1;rampComboT=6;rampCount++;
+ const base=25000*rampCombo;add(base,r.ex,r.ey-30,'#00f0ff');
+ showBanner(L('ramp'),rampCombo>1?'COMBO x'+rampCombo+'  +'+fmt(base*mult):'+'+fmt(base*mult),1.6);
+ sfxRamp();lampFlash=0.8;burst(r.ex,r.ey,24,pal(),380,'spark',0.6,3,0);
+ if(rampCount%5===0){mult=Math.min(6,mult+1);updHud();setTimeout(()=>showBanner(L('ramp5'),L('multx')+mult,1.8),900);}
+ if(rampCombo>=3){for(let k=0;k<4;k++)setTimeout(()=>rocket(),k*180);}
+}
+function updRamps(dt){
+ if(rampComboT>0)rampComboT-=dt;
+ ramps.forEach(r=>r.lit=Math.max(0,r.lit-dt));
+ for(const b of balls){if(!b.ramp)continue;const r=b.ramp;b.rd+=1150*dt;
+  if(b.rd>=r.path.total){const e=r.path.pts[r.path.pts.length-1];b.x=e[0];b.y=e[1];b.vx=r.exitV[0];b.vy=r.exitV[1];b.cap=false;b.ramp=null;b.noRamp=0.8;sfxTarget();continue;}
+  const [x,y]=rampPos(r,b.rd);b.x=x;b.y=y;if(rand()<0.6)P(x,y,(rand()-0.5)*60,(rand()-0.5)*60,0.4,2.5,pick(pal()),'spark',0,0.95);}
+ for(const b of balls){if(b.cap||b.ramp)continue;if(b.noRamp>0){b.noRamp-=dt;continue;}
+  for(const r of ramps)if(b.vy<-350&&Math.hypot(b.x-r.ex,b.y-r.ey)<24){enterRamp(b,r);break;}}
+}
 let drops=[{x:34,y:420},{x:34,y:470},{x:34,y:520}];
 const jackSeg={x1:516,y1:455,x2:516,y2:505,e:0.5};
 const flippers=[{L:true,px:172,py:868,a:0.5,rest:0.5,up:-0.45,w:0,on:false},{L:false,px:378,py:868,a:0.5,rest:0.5,up:-0.45,w:0,on:false}];
@@ -399,11 +426,11 @@ function buildTable(){
  segs=[];arcPts=[];
  for(let i=0;i<=40;i++){const a=Math.PI+Math.PI*i/40;arcPts.push([300+275*Math.cos(a),290+250*Math.sin(a)]);}
  for(let i=0;i<40;i++)seg(arcPts[i][0],arcPts[i][1],arcPts[i+1][0],arcPts[i+1][1],0.35,'arc');
- seg(25,290,25,745);seg(575,290,575,1000);
+ seg(25,290,25,728);seg(575,290,575,1000);
  seg(525,335,525,1000,0.3,'lane');seg(527,333,575,290,0.3,'gate');seg(525,975,575,975,0.05,'plunger');
- seg(25,745,165,862,0.3);seg(525,745,385,862,0.3);
- seg(70,630,70,730);seg(70,730,140,790);seg(70,630,140,790,0.5,'sling','L');
- seg(480,630,480,730);seg(480,730,410,790);seg(480,630,410,790,0.5,'sling','R');
+ seg(25,728,180.3,858,0.25);seg(525,728,369.7,858,0.25);
+ seg(70,618,70,718);seg(70,718,140,778);seg(70,618,140,778,0.5,'sling','L');
+ seg(480,618,480,718);seg(480,718,410,778);seg(480,618,410,778,0.5,'sling','R');
  [175,215,255,295,335,375].forEach(x=>seg(x,95,x,132,0.4,'post'));
  lamps=[];
  for(let i=2;i<=38;i+=2){const a=Math.PI+Math.PI*i/40;lamps.push([300+258*Math.cos(a),290+233*Math.sin(a)]);}
@@ -424,7 +451,7 @@ function setHS(v){try{localStorage.setItem(hsKey(),String(Math.floor(v)));}catch
 function newGame(){
  balls=[];score=0;ballNum=1;ballsTotal=3;mult=1;lanes=[0,0,0,0,0];locks=0;saveUntil=0;
  nextSmall=25000;nextBig=100000;megaDone=false;nextMillion=1000000;launchQueue=0;serveTimer=-1;jackpotCount=0;
- parts=[];rockets=[];rings=[];popups=[];banner=null;drops.forEach(d=>d.down=false);saucer.ball=null;dropReset=-1;
+ rampCombo=0;rampComboT=0;rampCount=0;parts=[];rockets=[];rings=[];popups=[];banner=null;drops.forEach(d=>d.down=false);saucer.ball=null;dropReset=-1;
  serveBall();showBanner(TN(T),L('ball')+' 1',1.8);state='play';updHud();
 }
 function serveBall(){balls.push({x:550,y:962,vx:0,vy:0,trail:[],fresh:true,still:0});plunger.charge=0;}
@@ -489,7 +516,7 @@ function collideSeg(b,s){
  if(d2>=BR*BR)return-1;
  const d=Math.sqrt(d2)||0.001;nx/=d;ny/=d;b.x=px+nx*BR;b.y=py+ny*BR;
  const vn=b.vx*nx+b.vy*ny;
- if(vn<0){b.vx-=(1+s.e)*vn*nx;b.vy-=(1+s.e)*vn*ny;const tx=-ny,ty=nx,vt=b.vx*tx+b.vy*ty;b.vx-=vt*0.015*tx;b.vy-=vt*0.015*ty;}
+ if(vn<0){b.vx-=(1+s.e)*vn*nx;b.vy-=(1+s.e)*vn*ny;if(vn<-80){const tx=-ny,ty=nx,vt=b.vx*tx+b.vy*ty;b.vx-=vt*0.01*tx;b.vy-=vt*0.01*ty;}}
  b._nx=nx;b._ny=ny;return vn<0?-vn:0;
 }
 function collideCircle(b,c,e,kick){
@@ -565,10 +592,10 @@ function update(dt){
   if(launchQueue>0){launchTimer-=dt;if(launchTimer<=0){launchQueue--;launchTimer=0.55;balls.push({x:550,y:950,vx:0,vy:-(2150+rand()*250),trail:[],still:0});sfxLaunch(1);}}
   if(serveTimer>0){serveTimer-=dt;if(serveTimer<=0){serveTimer=-1;serveBall();updHud();}}
   if(dropReset>0){dropReset-=dt;if(dropReset<=0)drops.forEach(d=>d.down=false);}
-  physics(dt);sensors(dt);
+  physics(dt);sensors(dt);updRamps(dt);
   for(let i=balls.length-1;i>=0;i--){const b=balls[i];
    b.trail.push([b.x,b.y]);if(b.trail.length>7)b.trail.shift();
-   const sp=Math.hypot(b.vx,b.vy);if(!b.cap&&b.x<525&&sp<25)b.still+=dt;else b.still=0;
+   const sp=Math.hypot(b.vx,b.vy);if(!b.cap&&!b.ramp&&b.x<525&&sp<25)b.still+=dt;else b.still=0;
    if(b.still>2.5){b.vx=(rand()-0.5)*300;b.vy=-400;b.still=0;}
    if(b.y>H+25||b.x<0||b.x>W){balls.splice(i,1);
     if(balls.length===0&&launchQueue===0){
@@ -706,7 +733,15 @@ function buildBg(){
  drawWalls(7,hexA(c.wall,0.9),16);g.shadowBlur=0;drawWalls(2,'rgba(255,255,255,.85)',0);
  g.shadowBlur=0;
  // slynge-trekanter (fyll)
- [[70,630,70,730,140,790],[480,630,480,730,410,790]].forEach(p=>{g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(p[2],p[3]);g.lineTo(p[4],p[5]);g.closePath();g.fillStyle=hexA(c.n1,0.25);g.fill();});
+ [[70,618,70,718,140,778],[480,618,480,718,410,778]].forEach(p=>{g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(p[2],p[3]);g.lineTo(p[4],p[5]);g.closePath();g.fillStyle=hexA(c.n1,0.25);g.fill();});
+ // kanaler (glassrør) og innganger
+ ramps.forEach(r=>{const pts=r.path.pts;const tube=(w,col)=>{g.strokeStyle=col;g.lineWidth=w;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke();};
+  g.lineCap='round';g.lineJoin='round';tube(34,'rgba(0,0,0,.35)');tube(30,hexA(c.n2,0.13));
+  g.shadowColor=c.n2;g.shadowBlur=10;g.save();g.setLineDash([]);
+  const off=(sgn)=>{g.beginPath();for(let i=0;i<pts.length;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,x=pts[i][0]-dy/l*15*sgn,y=pts[i][1]+dx/l*15*sgn;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();};
+  g.strokeStyle=hexA(c.n2,0.85);g.lineWidth=2.5;off(1);off(-1);g.restore();g.shadowBlur=0;
+  g.strokeStyle='rgba(255,255,255,.25)';g.lineWidth=2;g.setLineDash([2,10]);tube(2,'rgba(255,255,255,.25)');g.setLineDash([]);
+  g.fillStyle='rgba(0,0,0,.6)';g.beginPath();g.ellipse(r.ex,r.ey,20,10,0,0,6.283);g.fill();g.strokeStyle=c.n2;g.lineWidth=3;g.stroke();});
  // saucer-hull
  g.fillStyle='#000';g.beginPath();g.arc(saucer.x,saucer.y,15,0,6.283);g.fill();g.strokeStyle=hexA(c.n3,0.6);g.lineWidth=3;g.stroke();
  // fotplate under flipperne
@@ -749,6 +784,10 @@ function render(){
  for(let i=0;i<3;i++){const a=-Math.PI/2+(i-1)*0.9,x=saucer.x+Math.cos(a)*30,y=saucer.y+Math.sin(a)*30,on=i<locks||(saucer.ball&&ph%2);g.fillStyle=on?c.n3:'rgba(255,255,255,.12)';g.beginPath();g.arc(x,y,5,0,6.283);g.fill();}
  // ball save
  const sv=now<saveUntil&&state==='play';g.fillStyle=sv&&(ph%4<2||saveUntil-now>3)?'#00ffa3':'rgba(255,255,255,.08)';g.font='900 14px Impact,sans-serif';g.fillText('BALL SAVE',275,960);
+ // kanal-innganger (piler) + lys som løper i røret
+ ramps.forEach(r=>{for(let k=0;k<3;k++){const on=((ph>>1)+k)%3===0||r.lit>0;const y=r.ey+26+k*14;g.globalAlpha=on?1:0.25;g.fillStyle=c.n2;g.beginPath();g.moveTo(r.ex,y-7);g.lineTo(r.ex+9,y+4);g.lineTo(r.ex-9,y+4);g.closePath();g.fill();}
+  g.globalAlpha=1;g.globalCompositeOperation='lighter';const P=r.path;for(let k=0;k<4;k++){const d=((now*500+k*P.total/4)%P.total);const [x,y]=rampPos(r,d);g.globalAlpha=r.lit>0?1:0.5;g.drawImage(glow(c.n2),x-12,y-12,24,24);}g.globalAlpha=1;g.globalCompositeOperation='source-over';
+  if(r.lit>0){g.globalAlpha=r.lit/0.6;g.strokeStyle='#fff';g.lineWidth=4;g.beginPath();g.ellipse(r.ex,r.ey,24,13,0,0,6.283);g.stroke();g.globalAlpha=1;}});
  // drop targets
  drops.forEach(d=>{if(d.down){g.fillStyle='rgba(255,78,205,.25)';g.fillRect(d.x-4,d.y-15,5,30);}else{g.fillStyle='#ff4ecd';g.fillRect(d.x-4,d.y-17,10,34);g.globalCompositeOperation='lighter';g.drawImage(glow('#ff4ecd'),d.x-20,d.y-24,48,48);g.globalCompositeOperation='source-over';}});
  // jackpot-mål
